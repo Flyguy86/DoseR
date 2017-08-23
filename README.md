@@ -9,9 +9,9 @@ hydro process control sysytem
   - IFTT monitors Google Calendar for Feed event
   - Check water level sensor
     - If empty Open Fill Valve
-    - If full Turn on feed pump
-  - Activate dosing pumps, Timer
-  - Turn on Feed Pump
+      - If full Turn on feed pump
+  - Activate dosing pumps (timer)
+  - Turn on Feed Pump (timer)
     - If Water level Full & dosing pumps off
   - repeat xfeed times
 - #### Reciruclation system
