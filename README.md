@@ -24,6 +24,9 @@ hydro process control sysytem
 2. IFTT -> google Calendar name search
 3. Create Google Calendar event
 ````
+![Image of GrowStacks & Google Calendar](https://github.com/Flyguy86/DoseR/blob/master/google%20Calendar%20dosing.png)
+
+
 ## Hardware
 - GrowStacks Doser board (IoT) 
   - DHT11 Temperature Humidity sensor
