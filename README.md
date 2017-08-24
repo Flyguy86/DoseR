@@ -77,9 +77,27 @@ example: **wfull:1,pumpofftime:600**
 **Optional:** Door Alarm
 ````
     alrtenable: int
-      1 Enable alerts, Disables Water empty sensor 
-      2 Enable alerts, Disables Flow sensor 1 
-      3 Enable alerts, Disables Flow sensor 2
+      1 Enable alerts, use Water empty sensor 
+      2 Enable alerts, use Flow sensor 1 
+      3 Enable alerts, use Flow sensor 2
+      0 No sensor
+      
+    alrtsensor: int
+      1 Analogval > Alert_Threshold; returns true
+      0 Analogval < Alert_Threshold; returns true
+      -1 No sensor
+      
+    alrtrelay: int
+      1 Fill pin
+      2 Flush pin
+      0 No relay
+````
+
+**Optional:** Magic Button
+````
+    butnenable: int
+      1 Enable alerts, use Flow sensor 1
+      2 Enable alerts, use Flow sensor 2
       0 No sensor
       
     alrtsensor: int
@@ -94,7 +112,7 @@ example: **wfull:1,pumpofftime:600**
 ````
 
 **Optional:** Flush value / Flush Pump 
-- requires Empty water Sensor
+- requires Empty water Sensor, in Reciruclation system 
 ````
     flow: int 
       1 Top feed flow, Drain to waste
