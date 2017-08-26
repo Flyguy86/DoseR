@@ -3,10 +3,34 @@
 hydro process control sysytem
 
 
-## Todo
- - beta 1
-  - 
+## Beta 1 release notes 
+ - beta1
+   - Add feedpumpoffin web input
+   - Add feedpumpoffin variable set  FeedPump.changePeriod(pumpofftime);
+   - setvar function 
+     - Added check for blank value passed, just ignore
+   
+```` 
+  if(feedpumpoffin != -1)
+     feedpumpoffin = f;
+  if(WaterFullLogic != -1)
+     WaterFullLogic = wf;
+  if(WaterEmptyLogic == -1)
+     WaterEmptyLogic = we;
+````
+  - fixed coding errors from cleaning up formatting
 
+## Todo
+ - Add EEProm Read / Write of user prefences
+ - Add Fill type setting (Ball, Solienoid)
+ - Add Alarm sensor
+   - Read with water level sensor timer (5 seconds)
+   - high/low reponse (Turn on relay) (outpins fill, ball open, ball close)
+   - Turn off response when oposite 
+   - inverse option for sensor high/low
+   - publish event - DHT sensor publish timer (5 min)
+   - Manual alarm pin on
+   - If manual Trigger alarm Don't auto turn off Alarm
 ### Work Flow
 - #### Top Feed drip irrigation
   - IFTT monitors Google Calendar for Feed event
