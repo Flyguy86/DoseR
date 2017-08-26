@@ -2,9 +2,12 @@
 
 hydro process control sysytem
 
-## Process
 
-### Flow
+## Todo
+ - beta 1
+  - 
+
+### Work Flow
 - #### Top Feed drip irrigation
   - IFTT monitors Google Calendar for Feed event
   - Check water level sensor
