@@ -3,26 +3,19 @@
 hydro process control sysytem
 
 
-## Beta 1 release notes 
- - beta1
-   - Add feedpumpoffin web input
-   - Add feedpumpoffin variable set  FeedPump.changePeriod(pumpofftime);
-   - setvar function 
-     - Added check for blank value passed, just ignore
-   
-```` 
-  if(feedpumpoffin != -1)
-     feedpumpoffin = f;
-  if(WaterFullLogic != -1)
-     WaterFullLogic = wf;
-  if(WaterEmptyLogic == -1)
-     WaterEmptyLogic = we;
-````
-  - fixed coding errors from cleaning up formatting
+## Beta 2 release notes 
+ - beta2
+   - EEProm Read / Write,  
+   - Running Varabiles stored in Struct
+   - EEProm Variables stored in Struct 
+     - on boot read from EEProm, Persistent settings
+     - Variable / EEprom read publish debug functions
+     - all variables are defined in struct
+     - 
+ - Done - Add EEProm Read / Write of user prefences
 
 ## Todo
- - Add EEProm Read / Write of user prefences
- - Add Fill type setting (Ball, Solienoid)
+ - Done - Add Fill type setting (Ball, Solienoid)
  - Add Alarm sensor
    - Read with water level sensor timer (5 seconds)
    - high/low reponse (Turn on relay) (outpins fill, ball open, ball close)
