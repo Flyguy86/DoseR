@@ -72,15 +72,20 @@ example: **xfeed:1,m:1g:10,b:100,ph:0**
     b: int        //Number seconds to power dosing pump 3
     ph: int       //Number seconds to power dosing pump 4
 ````
+
 #### set:
-example: **wfull:1,pumpofftime:600**
+example: **wfull:1,pumpofftime:600,fill:0,alrmpin:0**
 ````
     wfull: int
       1  Analogval > Water_Full_Value; returns true
       0  Analogval < Water_Full_Value; returns true
-      -1 No sensor
+     -1 No sensor
     pumpofftime: int
        0 - 65000 seconds Feed pump run time in seconds
+    fill: int
+       0  =  CR03 wiring Ball value
+       1  =  Nonlatching solenoid value
+       
 ````
 
 **Optional:** Empty water Sensor
@@ -88,29 +93,35 @@ example: **wfull:1,pumpofftime:600**
     wempty: int
       1 Analogval > Water_Empty_Value; returns true
       0 Analogval < Water_Empty_Value; returns true
-      -1 No sensor
+     -1 No sensor
     pumpempty: int
        1 Pump off wempty true
-       -1 No sensor
+      -1 No sensor
 ````
 
 **Optional:** Door Alarm
 ````
-    alrtenable: int
+    alrmpin: int
+      0 Disabled
       1 Enable alerts, use Water empty sensor 
       2 Enable alerts, use Flow sensor 1 
       3 Enable alerts, use Flow sensor 2
-      0 No sensor
       
-    alrtsensor: int
+    alrmlogic: int
       1 Analogval > Alert_Threshold; returns true
       0 Analogval < Alert_Threshold; returns true
       -1 No sensor
       
-    alrtrelay: int
-      1 Fill pin
-      2 Flush pin
-      0 No relay
+    alrmact:
+      if fill-device
+        alrm pin 1 == ball open
+        alrm pin 2 == ball close
+      else
+        alrm pin1 == fill
+
+    alrmthresh:       // sensor comapre to threshold.  2000 is the middle of the sensor range.
+         default 2000   // 0 - 4096
+
 ````
 
 **Optional:** Magic Button
