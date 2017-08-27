@@ -3,27 +3,25 @@
 hydro process control sysytem
 
 
-## Beta 2 release notes 
- - beta2
-   - EEProm Read / Write,  
-   - Running Varabiles stored in Struct
-   - EEProm Variables stored in Struct 
-     - on boot read from EEProm, Persistent settings
-     - Variable / EEprom read publish debug functions
-     - all variables are defined in struct
-     - 
- - Done - Add EEProm Read / Write of user prefences
+## Beta 3 release notes 
+ - beta3
+   - Done - Add Fill type setting (Ball, Solienoid)
+   - Add Alarm sensor
+     - Read with water level sensor timer (5 seconds)
+     - high/low reponse (Turn on relay) (outpins fill, ball open, ball close)
+     - Turn off response when oposite 
+     - inverse option for sensor high/low
+     - publish event - DHT sensor publish timer (5 min)
+     - Manual alarm pin on
+     - If manual Trigger alarm Don't auto turn off Alarm
 
 ## Todo
- - Done - Add Fill type setting (Ball, Solienoid)
- - Add Alarm sensor
-   - Read with water level sensor timer (5 seconds)
-   - high/low reponse (Turn on relay) (outpins fill, ball open, ball close)
-   - Turn off response when oposite 
-   - inverse option for sensor high/low
-   - publish event - DHT sensor publish timer (5 min)
-   - Manual alarm pin on
-   - If manual Trigger alarm Don't auto turn off Alarm
+ - Beta 4
+   - Add the relay control, based on fill device.. 
+   - Debug and test ?
+   - udpate documentaion in Read me
+   - add pictures for the rest of components 
+   
 ### Work Flow
 - #### Top Feed drip irrigation
   - IFTT monitors Google Calendar for Feed event
@@ -31,8 +29,8 @@ hydro process control sysytem
     - If Not full: Open Fill Valve
       - If full: Turn on feed pump
   - Activate dosing pumps (timer)
-  - Turn on Feed Pump (timer)
-    - If Water level Full & dosing pumps off
+  - If Water level Full & dosing pumps off
+    - Turn on Feed Pump (timer)
   - repeat xfeed times
 - #### Reciruclation system
   - Comming in a bit
