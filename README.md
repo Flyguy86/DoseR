@@ -89,6 +89,7 @@ example: **xfeed:1,m:1g:10,b:100,ph:0**
 
 #### set:
 example: **wfull:1,pumpofftime:600,fill:0,alrmpin:0**
+
     - feedpumpoffin:600  Set and store the time Feed pump will run in seconds
     - wfull:0  Set the logic of the Water full float sensor
     - wempty:0 Set the logic of the Water empty float sensor
