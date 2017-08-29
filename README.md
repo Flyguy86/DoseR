@@ -20,7 +20,13 @@ hydro process control sysytem
    - Add the relay control, based on fill device.. 
    - Debug and test ?
    - udpate documentaion in Read me
-   - add pictures for the rest of components 
+   - add pictures for the rest of components
+   - Particle.function("start", ExStart);   // Sart,  Pump1 on, Dose1 on,Dose2 on,Dose3 on,Dose4 on, Fill on,
+   - Particle.function("stop", ExStop);   // Stop,   Pump1 off,  Dose1 Off, Dose2 Off, Dose3 Off, Dose4 Off, Fill Close,  
+   - Particle.function("set", SetVar);     // setting
+   - Particle.function("ReadTemp", ExreadDHT);   //
+   - Particle.function("AlarmOnOff", SetVar);      // Toggle Alarm On and Off
+   - Particle.function("AlarmDisab", ExreadDHT);   // Toggle Alarm Disarm
    
 ### Work Flow
 - #### Top Feed drip irrigation
