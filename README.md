@@ -3,30 +3,39 @@
 hydro process control sysytem
 
 
-## Beta 3 release notes 
- - beta3
-   - Done - Add Fill type setting (Ball, Solienoid)
-   - Add Alarm sensor
-     - Read with water level sensor timer (5 seconds)
-     - high/low reponse (Turn on relay) (outpins fill, ball open, ball close)
-     - Turn off response when oposite 
-     - inverse option for sensor high/low
-     - publish event - DHT sensor publish timer (5 min)
-     - Manual alarm pin on
-     - If manual Trigger alarm Don't auto turn off Alarm
-
-## Todo
- - Beta 4
-   - Add the relay control, based on fill device.. 
-   - Debug and test ?
+## Beta 4 release notes 
+ - beta 5
    - udpate documentaion in Read me
    - add pictures for the rest of components
-   - Particle.function("start", ExStart);   // Sart,  Pump1 on, Dose1 on,Dose2 on,Dose3 on,Dose4 on, Fill on,
-   - Particle.function("stop", ExStop);   // Stop,   Pump1 off,  Dose1 Off, Dose2 Off, Dose3 Off, Dose4 Off, Fill Close,  
-   - Particle.function("set", SetVar);     // setting
-   - Particle.function("ReadTemp", ExreadDHT);   //
-   - Particle.function("AlarmOnOff", SetVar);      // Toggle Alarm On and Off
-   - Particle.function("AlarmDisab", ExreadDHT);   // Toggle Alarm Disarm
+   - Particle.function("start", ExStart);
+      - f:1 Opens fill  auto close on float sensor high
+      - f:0 closes fill
+      - p:1 Feed Pump on  - time length defined in setVar, or manual shut off
+      - p:0 Feed Pump off
+      - d1:10 Dose pump 1 on for 10 seconds
+      - d2:20 Dose pump 2 on for 20 seconds
+      - d3:30 Dose pump 3 on for 30 seconds
+      - d4:40 Dose pump 4 on for 40 seconds
+   - Particle.function("stop", ExStop);   // Stops all pumps, and closes the ball valve and fill valve
+   - Particle.function("set", SetVar);     //
+     - feedpumpoffin:120  Set and store the time Feed pump will run in seconds
+     - wfull:1  Set the logic of the Water full float sensor
+     - wempty:1 Set the logic of the Water empty float sensor
+     - fill:0   select Fill hardware    0=Ball valve,  1=Fill Solienoid
+       - Fill hardware : 0,   defines alarm action pin,   Ball Open +12v ssr
+       - Fill Hardware : 1,   defines alarm action pin,   Fill solenoid pin
+     - alrmpin:1   Set alarm sensor pin,    1=water empty sensor,     2=Flow 1 sensor,    3=Flow2 sensor
+     - alrmthresh:2000  the value the analog sensor compares against, values between 0-4096
+     - alrmlogic:1    1  Sensor value < Threshold   0 Sensor value >= Threshold
+   - Particle.function("AlarmOnOff", SetVar);      
+     - Toggle Enable/Disable  Action pin  Broad casts enabled Action every 5 min
+   - Particle.function("AlarmDisab", ExreadDHT);   
+     - Toggle Enable/disable alarm,  Broadcasts disabled message every 5 min
+   - Add the relay control, based on fill device..    
+## Todo
+ - Beta 5
+   - Debug and test ?
+
    
 ### Work Flow
 - #### Top Feed drip irrigation
