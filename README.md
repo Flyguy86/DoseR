@@ -88,11 +88,11 @@ example: **xfeed:1,m:1g:10,b:100,ph:0**
 ````
 
 #### set:
-example: **wfull:1,pumpofftime:600,fill:0,alrmpin:0**
+example: **wfull:1,feedpumpoffin:600,fill:0,alrmpin:1,alrmlogic:1**
 
     - feedpumpoffin:600  Set and store the time Feed pump will run in seconds
-    - wfull:0  Set the logic of the Water full float sensor
-    - wempty:0 Set the logic of the Water empty float sensor
+    - wfull:0  Set the logic of the Water full float sensor   1  Sensor value < Threshold   0 Sensor value >= Threshold
+    - wempty:0 Set the logic of the Water empty float sensor  1  Sensor value < Threshold   0 Sensor value >= Threshold
     - fill:1   select Fill hardware    0=Ball valve,  1=Fill Solienoid
       - Fill hardware : 0,   defines alarm action pin,   Ball Open +12v ssr
       - Fill Hardware : 1,   defines alarm action pin,   Fill solenoid pin
