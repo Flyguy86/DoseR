@@ -7,7 +7,7 @@ hydro process control sysytem
  - beta 5
    - udpate documentaion in Read me
    - add pictures for the rest of components
-   - Particle.function("start", ExStart);
+   - Particle Function "start"
       - f:1 Opens fill  auto close on float sensor high
       - f:0 closes fill
       - p:1 Feed Pump on  - time length defined in setVar, or manual shut off
@@ -16,8 +16,9 @@ hydro process control sysytem
       - d2:20 Dose pump 2 on for 20 seconds
       - d3:30 Dose pump 3 on for 30 seconds
       - d4:40 Dose pump 4 on for 40 seconds
-   - Particle.function("stop", ExStop);   // Stops all pumps, and closes the ball valve and fill valve
-   - Particle.function("set", SetVar);     //
+   - Particle Function stop
+     - Stops all pumps, and closes the ball valve and fill valve
+   - Particle Function set
      - feedpumpoffin:120  Set and store the time Feed pump will run in seconds
      - wfull:1  Set the logic of the Water full float sensor
      - wempty:1 Set the logic of the Water empty float sensor
@@ -27,9 +28,9 @@ hydro process control sysytem
      - alrmpin:1   Set alarm sensor pin,    1=water empty sensor,     2=Flow 1 sensor,    3=Flow2 sensor
      - alrmthresh:2000  the value the analog sensor compares against, values between 0-4096
      - alrmlogic:1    1  Sensor value < Threshold   0 Sensor value >= Threshold
-   - Particle.function("AlarmOnOff", SetVar);      
+   - AlarmOnOff      
      - Toggle Enable/Disable  Action pin  Broad casts enabled Action every 5 min
-   - Particle.function("AlarmDisab", ExreadDHT);   
+   - AlarmDisab"   
      - Toggle Enable/disable alarm,  Broadcasts disabled message every 5 min
    - Add the relay control, based on fill device..    
 ## Todo
@@ -88,18 +89,35 @@ example: **xfeed:1,m:1g:10,b:100,ph:0**
 
 #### set:
 example: **wfull:1,pumpofftime:600,fill:0,alrmpin:0**
-````
-    wfull: int
-      1  Analogval > Water_Full_Value; returns true
-      0  Analogval < Water_Full_Value; returns true
-     -1 No sensor
-    pumpofftime: int
-       0 - 65000 seconds Feed pump run time in seconds
-    fill: int
-       0  =  CR03 wiring Ball value
-       1  =  Nonlatching solenoid value
-       
-````
+     - feedpumpoffin:600  Set and store the time Feed pump will run in seconds
+     - wfull:0  Set the logic of the Water full float sensor
+     - wempty:0 Set the logic of the Water empty float sensor
+     - fill:1   select Fill hardware    0=Ball valve,  1=Fill Solienoid
+       - Fill hardware : 0,   defines alarm action pin,   Ball Open +12v ssr
+       - Fill Hardware : 1,   defines alarm action pin,   Fill solenoid pin
+     - alrmpin:0   Set alarm sensor pin,    1=water empty sensor,     2=Flow 1 sensor,    3=Flow2 sensor
+     - alrmthresh:2000  the value the analog sensor compares against, values between 0-4096
+     - alrmlogic:0    1  Sensor value < Threshold   0 Sensor value >= Threshold
+
+#### stop:
+     - Stops all pumps, and closes the ball valve and fill valve
+
+#### start:
+example: **f:1,p:0,d1:300,d2:100,d3:300,d4:0**
+      - f:1 Opens fill  auto close on float sensor high
+      - f:0 closes fill
+      - p:1 Feed Pump on  - time length defined in setVar, or manual shut off
+      - p:0 Feed Pump off
+      - d1:10 Dose pump 1 on for 10 seconds
+      - d2:20 Dose pump 2 on for 20 seconds
+      - d3:30 Dose pump 3 on for 30 seconds
+      - d4:40 Dose pump 4 on for 40 seconds
+
+#### AlarmOnOff
+   - Toggle Enable/Disable  Action pin  Broad casts enabled Action every 5 min
+#### AlarmDisab   
+     - Toggle Enable/disable alarm,  Broadcasts disabled message every 5 min
+
 
 **Optional:** Empty water Sensor
 ````
