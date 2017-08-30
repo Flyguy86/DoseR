@@ -3,39 +3,18 @@
 hydro process control sysytem
 
 
-## Beta 4 release notes 
- - beta 5
-   - udpate documentaion in Read me
-   - add pictures for the rest of components
-   - Particle Function "start"
-      - f:1 Opens fill  auto close on float sensor high
-      - f:0 closes fill
-      - p:1 Feed Pump on  - time length defined in setVar, or manual shut off
-      - p:0 Feed Pump off
-      - d1:10 Dose pump 1 on for 10 seconds
-      - d2:20 Dose pump 2 on for 20 seconds
-      - d3:30 Dose pump 3 on for 30 seconds
-      - d4:40 Dose pump 4 on for 40 seconds
-   - Particle Function stop
-     - Stops all pumps, and closes the ball valve and fill valve
-   - Particle Function set
-     - feedpumpoffin:120  Set and store the time Feed pump will run in seconds
-     - wfull:1  Set the logic of the Water full float sensor
-     - wempty:1 Set the logic of the Water empty float sensor
-     - fill:0   select Fill hardware    0=Ball valve,  1=Fill Solienoid
-       - Fill hardware : 0,   defines alarm action pin,   Ball Open +12v ssr
-       - Fill Hardware : 1,   defines alarm action pin,   Fill solenoid pin
-     - alrmpin:1   Set alarm sensor pin,    1=water empty sensor,     2=Flow 1 sensor,    3=Flow2 sensor
-     - alrmthresh:2000  the value the analog sensor compares against, values between 0-4096
-     - alrmlogic:1    1  Sensor value < Threshold   0 Sensor value >= Threshold
-   - AlarmOnOff      
-     - Toggle Enable/Disable  Action pin  Broad casts enabled Action every 5 min
-   - AlarmDisab"   
-     - Toggle Enable/disable alarm,  Broadcasts disabled message every 5 min
-   - Add the relay control, based on fill device..    
+## Beta 5
+ - Tested
+   - Start, Pump On/Off
+   - Set, Pumptime, WaterFull Logic
+   - WaterFull Sensor
+   - Dosing Pumps 1 - 4
+   - Feed Pump
+   - Xfeed:1,m:800,g:300,b:1600,ph:200
+   - Full Feed cycle
 ## Todo
- - Beta 5
-   - Debug and test ?
+ - Beta 6
+   - Debug and test 
 
    
 ### Work Flow
