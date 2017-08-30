@@ -241,7 +241,7 @@ class DHT {
 TCPClient client;
 PRODUCT_ID(5013); // replace by your product ID
 PRODUCT_VERSION(5); // increment each time you upload to the console
-#define PIN_FEED_PUMP D7 // A1
+#define PIN_FEED_PUMP A1
  #define PIN_RELAY_FLUSH D7
  #define PIN_RELAY_FILL D6
  #define PIN_WATER_FILL_BALL_OPEN A0
