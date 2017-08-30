@@ -241,7 +241,8 @@ class DHT {
 TCPClient client;
 PRODUCT_ID(5013); // replace by your product ID
 PRODUCT_VERSION(5); // increment each time you upload to the console
-#define PIN_FEED_PUMP A1
+#define PIN_FEED_PUMP D7 // A1
+ #define PIN_RELAY_FLUSH D7
  #define PIN_RELAY_FILL D6
  #define PIN_WATER_FILL_BALL_OPEN A0
  #define PIN_WATER_FILL_BALL_CLOSE A2
@@ -253,20 +254,25 @@ PRODUCT_VERSION(5); // increment each time you upload to the console
  #define PIN_PH_DOSE D5
  #define PIN_WATER_FULL A6
  #define PIN_WATER_EMPTY A5
- #define FILL_FLOW
+
 Timer Watertimer(500, setReadWaterFullFlag);   // This Constantly evalues the water level sensor, and set the Res Full Flag, True/False
- Timer FeedPump(0, FeedStop);
+ Timer FeedPump(900000, FeedStop);
  Timer Dose1(2000, Dose1Stop);
  Timer Dose2(1000, Dose2Stop);
  Timer Dose3(1500, Dose3Stop);
  Timer Dose4(500, Dose4Stop);
  Timer FeedLoop(5000, Feeder);
  Timer PollSensor(300000, setDHTread);  // Should be every 5 min
+
+int rawwater;
+int rawwaterEmpty;
+int resfull;
+
 struct runing_t {
       //User prefernces,  Ball Fill, Solenoid Fill, Magic Button, Door Alarm, Empty water Sensor,
       uint16_t fillstatus;
-      uint8_t resfull;
-      uint8_t error;
+      uint16_t resfull;
+      uint16_t error;
 
       uint16_t m;
       uint16_t g;
@@ -274,23 +280,24 @@ struct runing_t {
       uint16_t ph; // stored in seconds
 
       // uint8_t resful = -1;
-      uint8_t resempty;
-      uint8_t mixres;
-      uint8_t dosedRes;
-      uint8_t doseFlush;
-      uint8_t ballopened;
-      uint8_t ballclosed;
+      uint16_t resempty;
+      uint16_t mixres;
+      uint16_t dosedRes;
+      uint16_t doseFlush;
+      uint16_t ballopened;
+      uint16_t ballclosed;
+      uint16_t feedcompleted;
+      uint16_t lastfeedcomplete;
 
-      bool feedcompleted;
       bool readWaterLevelFlag;
       bool readAlrmFlag;
       bool readHumidTemp;
-      bool lastfeedcomplete;
+
       bool alrmOverRide;
       bool alrmPublish;
       bool alrmstatus;
-      bool alrmdisarm;
 
+      bool alrmdisarm;
       uint16_t Water_Full_Value = 2000; // Less Than 2000 is a full value.
       uint16_t Water_Empty_Value = 2000; // Greater Than 2000 water is empty
 
@@ -372,27 +379,26 @@ int Feeder(void){
     // feedcompleted = 2   Feedpump on  Full Res
     // feedcompleted = 21   Feedpump off, Ready to make another res, Just needs to be reset to 1
 
-   if (run.resfull == -1)   // -1 means the res full sensor has not been evaluated or is in some type of error.   0 = empty   1 = full
-        return -10;
-   if( (run.fillstatus == 1002 || run.fillstatus == 102) && run.resfull == 0 && !FeedPump.isActive() && !Dose1.isActive() && !Dose2.isActive() && !Dose3.isActive() && !Dose4.isActive() && run.feedcompleted != 1 ){  // 21 == Feed Pump  Off   Done pumping,   Check if we're all done or just done this cycle
-       FeedComplete();
-       return 3;
-    }
  //   if (resempty == 1 && feedcompleted != 1 ){   // prevents loop of constantly turning off Feed when Res is empty
  //        FeedStop();  // turns off if the res empty sensor is true, Else timer turns it off
  //        FeedComplete();
  //		return 4;
  //	}
 
-   if(EEPROMData.eevar.FeedCount){  // if we still have a count, status here shouold be 1
-
-	   if( run.resfull == 1 && !Dose1.isActive() && !Dose2.isActive() && !Dose3.isActive() && !Dose4.isActive() && !FeedPump.isActive() ){
-           FeedPumpOn();  // only feeds if Res reads full  && Dose completed
-           return 2;
-       }else if( run.resfull == 0 && run.feedcompleted == 1 && !FeedPump.isActive() ){  // 1 == New Fill
-           run.mixres = 1;
-           return 1;  // Filling
-       }
+   if(EEPROMData.eevar.FeedCount >= 1){  // if we still have a count, status here shouold be 1
+    if(Dose1.isActive() == 0 && Dose2.isActive() == 0 && Dose3.isActive() == 0 && Dose4.isActive() == 0 && FeedPump.isActive() == 0 ){
+  	   if( run.resfull == 1 ){
+             FeedPumpOn();  // only feeds if Res reads full  && Dose completed
+             return 3;
+          }else if( run.resfull == 0 && run.feedcompleted == 1 ){  // 1 == New Fill
+             run.mixres = 1;
+             return 2;  // Filling
+          }else if( run.resfull == 0 && run.feedcompleted == 21 && (run.fillstatus == 1002 || run.fillstatus == 102) ){
+             FeedComplete();
+             return 4;
+          }
+      return -1;
+    }
    }
  return -1;
  }
@@ -404,32 +410,34 @@ int mixReservour(void){
                 run.feedcompleted = 3;
                 fillCtrl("open", EEPROMData.eevar.fillDevice);    //opens both type of valves.
             }
+
             if( run.doseFlush == 1 || (run.dosedRes > 0 && run.dosedRes < 9) && (run.dosedRes >= 10 && run.dosedRes < 100) )
                 i=500;  // Skips this round of Dosing, Check for Dose Compelted.
+
             if(i == 1){
                 if(run.m > 0){
-                    run.dosedRes = run.dosedRes + 1;
-                    Dose1.changePeriod(run.m * 1000);
-                    pinCtrl(PIN_MICRO_DOSE, "Dose1", "on");
+                run.dosedRes = 1;
+                Dose1.changePeriod(run.m * 1000);
+                pinCtrl(PIN_MICRO_DOSE, "Dose1", "on");
                 }
             }
             if(i == 2){
                 if(run.g > 0){
-                run.dosedRes = run.dosedRes + 2;
+                run.dosedRes = 2;
                 Dose2.changePeriod(run.g * 1000);
                 pinCtrl(PIN_GROW_DOSE, "Dose2", "on");
                 }
             }
             if(i == 3){
                 if(run.b > 0){
-                run.dosedRes = run.dosedRes + 4;
+                run.dosedRes = 4;
                 Dose3.changePeriod(run.b * 1000);
                 pinCtrl(PIN_BLOOM_DOSE, "Dose3", "on");
                 }
             }
             if(i == 4){
                 if(run.ph > 0){
-                run.dosedRes = run.dosedRes + 8;
+                run.dosedRes = 8;
                 Dose4.changePeriod(run.ph * 1000);
                 pinCtrl(PIN_PH_DOSE, "Dose4", "on");
                 }
@@ -439,7 +447,6 @@ int mixReservour(void){
             }
         }
     }
- run.error = 1; // Res Is full and tried to mix new nutrients
  }
 void FeedComplete(void){
    if(EEPROMData.eevar.FeedCounter >= EEPROMData.eevar.FeedCount){
@@ -478,19 +485,19 @@ void ReadWaterLevel(void){
 	ReadWaterEmpty();
  }
 void ReadWaterFull(void){
-  int rawwater = analogRead(PIN_WATER_FULL);
+  rawwater = analogRead(PIN_WATER_FULL);
   run.resfull = sensorOperator(EEPROMData.eevar.wfullLogic, rawwater, run.Water_Full_Value);
- return;
+
+  if(run.resfull == 1 && run.ballclosed == 0 ){
+    fillCtrl("close", EEPROMData.eevar.fillDevice);
+  }
+
  }
 void ReadWaterEmpty(void){
-  int rawwaterEmpty = analogRead(PIN_WATER_EMPTY);
+  rawwaterEmpty = analogRead(PIN_WATER_EMPTY);
   run.resempty = sensorOperator(EEPROMData.eevar.sensorwEmptyLogic, rawwaterEmpty, run.Water_Empty_Value);
- return;
  }
-void closeFill(void){
-    fillCtrl("close", EEPROMData.eevar.fillDevice);
-    run.ballclosed = 1;
- }
+
 void pollDHT(){
 
     f = dht.readTemperature(true);
@@ -564,6 +571,7 @@ int fillCtrl(String action, bool type){
  return -1;
  }
 bool BallClosed(void){
+    run.ballclosed = 1;
     run.fillstatus = 102;
     pinCtrl(PIN_WATER_FILL_BALL_CLOSE, "BallValveClosing", "on");
     delay(6500);
@@ -579,6 +587,7 @@ bool BallOpened(void){
     return 1;
  }
 bool ValveOpen(void){
+    run.ballclosed = 0;
     run.fillstatus = 1001;
     pinCtrl(PIN_RELAY_FILL, "ValveOpened", "on");
     return 1;
@@ -590,29 +599,31 @@ bool ValveClose(void){
  }
 ////       Dose Control  & Pump   ////////
 void DoseCompleted(void){
-    if( !Dose1.isActive() && !Dose2.isActive() && !Dose3.isActive() && !Dose4.isActive() )
+    if( !Dose1.isActive() && !Dose2.isActive() && !Dose3.isActive() && !Dose4.isActive() ){
         run.dosedRes = 0;
+        Particle.publish("Dosing", "Completed");
+    }
  }
 void Dose1Stop(void){
-    run.dosedRes = run.dosedRes + 10;
+    run.dosedRes = 10;
     pinCtrl(PIN_MICRO_DOSE, "Dose1", "off");
     Dose1.stop();
     DoseCompleted();
  }
 void Dose2Stop(void){
-    run.dosedRes = run.dosedRes + 20;
+    run.dosedRes = 20;
     pinCtrl(PIN_GROW_DOSE, "Dose2", "off");
     Dose2.stop();
     DoseCompleted();
  }
 void Dose3Stop(void){
-    run.dosedRes = run.dosedRes + 40;
+    run.dosedRes = 40;
     pinCtrl(PIN_BLOOM_DOSE, "Dose3", "off");
     Dose3.stop();
     DoseCompleted();
  }
 void Dose4Stop(void){
-    run.dosedRes = run.dosedRes + 80;
+    run.dosedRes = 80;
     pinCtrl(PIN_PH_DOSE, "Dose4", "off");
     Dose4.stop();
     DoseCompleted();
@@ -624,13 +635,17 @@ void DoseStopAll(void){
     pinCtrl(PIN_PH_DOSE, "Dose4Forced", "off");
  }
 void FeedPumpOn(void){
-    EEPROMData.eevar.FeedCounter++;
+
     run.feedcompleted = 2;  // 2 = Feed Pump started
     FeedPump.changePeriod(EEPROMData.eevar.feedpumpofftime * 1000);
-    pinCtrl(PIN_FEED_PUMP, "FeedPump", "on");
     FeedPump.start();
+
+    pinCtrl(PIN_FEED_PUMP, "FeedPump", "on");
+
  }
 void FeedStop(void){
+
+    EEPROMData.eevar.FeedCounter++;
     run.feedcompleted = 21;  // 21 = Feed Pump Completed
     pinCtrl(PIN_FEED_PUMP, "FeedPump", "off");
     FeedPump.stop();
@@ -678,9 +693,9 @@ int AlarmOnOff(String a){
   run.alrmdisarm = !run.alrmdisarm;  // Changes the stat
 
   if(run.alrmdisarm == 1){
-    Particle.publish("Alarm Disarmed");
+    Particle.publish("Alarm", "Disarmed");
   }else if(run.alrmdisarm == 0){
-    Particle.publish("Alarm Enabled");
+    Particle.publish("Alarm", "armed");
   }
  return 1;
  }
@@ -689,10 +704,10 @@ int AlarmEnabDisab(String a){
 
   if(run.alrmOverRide == 1){
     AlarmAction(1, EEPROMData.eevar.alrmAction);
-    Particle.publish("Alarm action [enabled]");
+    Particle.publish("Alarm action", "Enabled");
   }else if(run.alrmOverRide == 0){
     AlarmAction(0, EEPROMData.eevar.alrmAction);
-    Particle.publish("Alarm action [disabled]");
+    Particle.publish("Alarm action", "Disabled");
   }
  return 1;
  }
@@ -759,14 +774,30 @@ int ExFeeder(String args){
     EEPROMData.eevar.FeedCount = parse_args_int(args, "xfeed");
     writeEEPROM();
 
-    if(m == -1)
+    if(m == -1){
        run.m = 0;
-    if(g == -1)
+    }else{
+      run.m = m;
+    }
+
+    if(g == -1){
        run.g = 0;
-    if(b == -1)
-       b = 0;
-    if(ph == -1)
+    }else{
+      run.g = g;
+    }
+
+    if(b == -1){
+       run.b = 0;
+    }else{
+       run.b = b;
+    }
+
+    if(ph == -1){
        run.ph = 0;
+    }else{
+       run.ph = ph;
+    }
+
     if(EEPROMData.eevar.FeedCount == -1)
        EEPROMData.eevar.FeedCount = 0;
 
@@ -779,7 +810,7 @@ int ExStop(String args){
     EEPROMData.eevar.FeedCount = 0;
     writeEEPROM();
 
-    closeFill();
+    fillCtrl("close", EEPROMData.eevar.fillDevice);
     DoseStopAll();
     FeedStop();
 
@@ -829,7 +860,7 @@ int ExStart(String args){
       Dose4Stop();
     }
 
- return -1;
+ return 1;
  }
 
 /////  Parse and Pin Control    /////
@@ -872,8 +903,8 @@ int readPubEEPROM(String a){
  return 1;
  }
 int publishRunningVariables(String a){
-  sprintf(run.publishString,"{\"fstat\": %d,\"rful\": %d,\"err\": %d,\"m\": %d,\"g\":%d,\"b\": %d,\"ph\":%d,\"rful\": %d,\"rempt\":%d,\"dostat\": %d,\"dosful\": %d,\"bopen\": %d,\"bclose\":%d,\"fcomp\":%d,\"flgwl\": %d,\"flgtmp\": %d,\"lstfed\": %d,\"compwful\":%d,\"compwept\":%d }",
-  run.fillstatus,run.resfull,run.error,run.m,run.g,run.b,run.ph,run.resfull,run.resempty,run.dosedRes,run.doseFlush,run.ballopened,run.ballclosed,run.feedcompleted,run.readWaterLevelFlag,run.readHumidTemp,run.lastfeedcomplete,run.Water_Full_Value,run.Water_Empty_Value);
+  sprintf(run.publishString,"{\"fstat\": %d,\"rful\": %d,\"err\": %d,\"m\": %d,\"g\":%d,\"b\": %d,\"ph\":%d,\"rful\": %d,\"rempt\":%d,\"dostat\": %d,\"dosful\": %d,\"bopen\": %d,\"bclose\":%d,\"fcomp\":%d,\"flgwl\": %d,\"flgtmp\": %d,\"lstfed\": %d,\"compwful\":%d,\"compwept\":%d,\"D1\": %d,\"D2\": %d,\"D3\": %d,\"D4\": %d,\"FP\": %d, }",
+  run.fillstatus,run.resfull,run.error,run.m,run.g,run.b,run.ph,run.resfull,run.resempty,run.dosedRes,run.doseFlush,run.ballopened,run.ballclosed,run.feedcompleted,run.readWaterLevelFlag,run.readHumidTemp,run.lastfeedcomplete,run.Water_Full_Value,run.Water_Empty_Value,Dose1.isActive(),Dose2.isActive(),Dose3.isActive(),Dose4.isActive(),FeedPump.isActive() );
   Particle.publish("Run Vars" + a, run.publishString);
  return 1;
  }
@@ -883,7 +914,7 @@ void setup() {
 
   readPubEEPROM("OnBoot");
   if (EEPROMData.eevar.version != 1 ){
-     EEPROMData.eevar.version = 0;
+     EEPROMData.eevar.version = 1;
      EEPROMData.eevar.wfullLogic = 1;
      EEPROMData.eevar.fillDevice = 0;
      EEPROMData.eevar.DeviceSensorwEmptypin = 0;
@@ -913,23 +944,20 @@ void setup() {
    }
 
    run.fillstatus = 0;
-   run.resfull = -1;
    run.error = 0;
    run.m = 0;
    run.g = 0;
    run.b = 0;
    run.ph = 0; // stored in seconds
 
-   run.resfull = -1;
-   run.resempty = -1;
+
    run.mixres = -1;
    run.dosedRes = -1;
    run.doseFlush = -1;
 
-   run.ballopened = 1;
-   run.ballclosed = 0;
+   run.ballopened = 0;
 
-   run.feedcompleted = 0;
+   run.feedcompleted = 1;  // 1 is the start state, 0 will not in the feed routine
    run.readWaterLevelFlag = 0;
    run.readHumidTemp = 0;
    run.readAlrmFlag = 0;
@@ -958,14 +986,8 @@ void setup() {
   Particle.function("AlrmOnOff", AlarmOnOff);      // Toggle Alarm On and Off
   Particle.function("AlrmEnDis", AlarmEnabDisab);   // Toggle Alarm Disarm
 
-  Particle.variable("FillStat", run.fillstatus);
-
-  Particle.variable("ResFull", run.resfull);
-  Particle.variable("ResEmpty", run.resempty);
-  Particle.variable("Micro", run.m);
-  Particle.variable("Grow", run.g);
-  Particle.variable("Bloom", run.b);
-  Particle.variable("PH", run.ph);
+  Particle.variable("ResFull", rawwater);
+  Particle.variable("ResEmpty", rawwaterEmpty);
 
   pinMode(PIN_WATER_FULL, INPUT);
   pinMode(PIN_FEED_PUMP, OUTPUT);
@@ -979,15 +1001,19 @@ void setup() {
   pinMode(PIN_PH_DOSE, OUTPUT);
   setADCSampleTime(ADC_SampleTime_144Cycles);
 
-  if(EEPROMData.eevar.fillDevice == 0 )
-    BallClosed();
+
 
   Watertimer.start();
   FeedLoop.start();
   dht.begin();
   PollSensor.start();
 
-  publishRunningVariables("on Statup");
+ if(EEPROMData.eevar.fillDevice == 0 )
+   BallClosed();
+
+   ReadWaterLevel();
+
+  publishRunningVariables("on Statup ");
  }
 void loop() {
    if(run.feedcompleted != run.lastfeedcomplete){
@@ -995,6 +1021,7 @@ void loop() {
         Particle.publish("StatusChange", run.publishString);
         run.lastfeedcomplete = run.feedcompleted;
      }
+
  	 if(run.readWaterLevelFlag == 1)
         ReadWaterLevel();
 
