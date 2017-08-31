@@ -719,7 +719,20 @@ int SetVar(String args){
   int alP = parse_args_int(args, "alrmpin");
   int alC = parse_args_int(args, "alrmthresh");
   int alL = parse_args_int(args, "alrmlogic");
+  int alAct = parse_args_int(args, "alrmaction");
 
+
+  if(alAct != -1){
+   if(alAct == 1){
+       EEPROMData.eevar.alrmAction = 1;
+   }else if(alAct == 2){
+       EEPROMData.eevar.alrmAction = 2;
+   }else if(alAct == 3){
+       EEPROMData.eevar.alrmAction = 3;
+   }else{
+     EEPROMData.eevar.alrmAction = 0;
+   }
+   }
   if(fill != -1){
     if(fill == 1){
     EEPROMData.eevar.fillDevice = fill; // Solenoid fill device
