@@ -321,8 +321,8 @@ struct settings_t {
 
     uint16_t feedpumpofftime;
 
-    uint8_t alrmPin;
-    uint8_t alrmAction;
+    uint16_t alrmPin;
+    uint16_t alrmAction;
     uint16_t alrmComp;  // sensor compare threshold
     bool alrmLogic;   // 1  =  sensorVal < Threshold
     uint8_t alrmAction2;
@@ -682,25 +682,25 @@ void setDHTread(){
           run.alrmPublish = 1;
  }
 /////      Internet Control         ///////
-int AlarmOnOff(String a){
+int AlarmEnabDisab(String a){
   run.alrmdisarm = !run.alrmdisarm;  // Changes the stat
 
   if(run.alrmdisarm == 1){
-    Particle.publish("Alarm", "Disarmed");
+    Particle.publish("Alarm", "Disabled");
   }else if(run.alrmdisarm == 0){
-    Particle.publish("Alarm", "armed");
+    Particle.publish("Alarm", "Enabled");
   }
  return 1;
  }
-int AlarmEnabDisab(String a){
+int AlarmOnOff(String a){
   run.alrmOverRide = !run.alrmOverRide;  // Changes the stat
 
   if(run.alrmOverRide == 1){
     AlarmAction(1, EEPROMData.eevar.alrmAction);
-    Particle.publish("Alarm action", "Enabled");
+    Particle.publish("Alarm", "On");
   }else if(run.alrmOverRide == 0){
     AlarmAction(0, EEPROMData.eevar.alrmAction);
-    Particle.publish("Alarm action", "Disabled");
+    Particle.publish("Alarm", "Off");
   }
  return 1;
  }
@@ -717,7 +717,6 @@ int SetVar(String args){
   int fill = parse_args_int(args, "fill");
 
   int alP = parse_args_int(args, "alrmpin");
-  int alAct = parse_args_int(args, "alrmact");
   int alC = parse_args_int(args, "alrmthresh");
   int alL = parse_args_int(args, "alrmlogic");
 
@@ -890,11 +889,12 @@ int parse_args_int(String &args, String q){
 int readPubEEPROM(String a){
   readEEPROM();
   delay(300);
-  sprintf(run.publishString,"{\"version\": %d, \"wfullLogic\": %d, \"fillDevice\": %d, \"DeviceSensorwEmptypin\": %d, \"DeviceSensorFlow1pin\": %d, \"DeviceSensorFlow2pin\": %d, \"feedpumpofftime\": %d, \"fillstat\": %d, \"FeedCount\": %d, \"FeedCounter\": %d }",
-  EEPROMData.eevar.version, EEPROMData.eevar.wfullLogic, EEPROMData.eevar.fillDevice, EEPROMData.eevar.DeviceSensorwEmptypin, EEPROMData.eevar.DeviceSensorFlow1pin, EEPROMData.eevar.DeviceSensorFlow2pin, EEPROMData.eevar.feedpumpofftime, EEPROMData.eevar.fillstat, EEPROMData.eevar.FeedCount, fcntr);
+  sprintf(run.publishString,"{\"version\": %d,\"wfullLogic\": %d,\"fillDevice\": %d,\"DevSwEmptypin\": %d,\"fdppofftime\": %d,\"flstat\": %d,\"FdCnt\": %d,\"FCnter\": %d,\"alPin\": %d,\"alAct\": %d,\"alCp\": %d,\"alLog\": %d }",
+  EEPROMData.eevar.version, EEPROMData.eevar.wfullLogic, EEPROMData.eevar.fillDevice, EEPROMData.eevar.DeviceSensorwEmptypin, EEPROMData.eevar.feedpumpofftime, EEPROMData.eevar.fillstat, EEPROMData.eevar.FeedCount, fcntr, EEPROMData.eevar.alrmPin, EEPROMData.eevar.alrmAction, EEPROMData.eevar.alrmComp, EEPROMData.eevar.alrmLogic);
   Particle.publish("EEPROM Read " + a, run.publishString);
  return 1;
  }
+
 int publishRunningVariables(String a){
   sprintf(run.publishString,"{\"fstat\": %d,\"rful\": %d,\"err\": %d,\"m\": %d,\"g\":%d,\"b\": %d,\"ph\":%d,\"rful\": %d,\"rempt\":%d,\"dostat\": %d,\"bopen\": %d,\"bclose\":%d,\"fcomp\":%d,\"flgwl\": %d,\"lstfed\": %d,\"cmwful\":%d,\"cmwept\":%d,\"D1\": %d,\"D2\": %d,\"D3\": %d,\"D4\": %d,\"FP\": %d,\"Feedcnt\": %d}",
   run.fillstatus,run.resfull,run.error,run.m,run.g,run.b,run.ph,run.resfull,run.resempty,run.dosedRes,run.ballopened,run.ballclosed,run.feedcompleted,run.readWaterLevelFlag,run.lastfeedcomplete,run.Water_Full_Value,run.Water_Empty_Value,Dose1.isActive(),Dose2.isActive(),Dose3.isActive(),Dose4.isActive(),FeedPump.isActive(), fcntr);
