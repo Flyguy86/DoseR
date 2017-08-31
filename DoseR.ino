@@ -295,7 +295,7 @@ struct runing_t {
 
       bool alrmOverRide;
       bool alrmPublish;
-      bool alrmstatus;
+      uint16_t alrmstatus;
 
       bool alrmdisarm;
       uint16_t Water_Full_Value = 2000; // Less Than 2000 is a full value.
@@ -541,11 +541,11 @@ int publishAlarm(String args){
      run.alrmPublish = 0;
 
      if(run.alrmdisarm == 1){
-       Particle.publish("Alarm Disarmed");
+       Particle.publish("Alarm", "Disarmed");
      }
 
      if(run.alrmOverRide == 1){
-       Particle.publish("Alarm action [enabled]");
+       Particle.publish("Alarm action", "enabled");
      }
   return 1;
   }
