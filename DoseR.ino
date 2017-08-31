@@ -746,11 +746,11 @@ int SetVar(String args){
    }
   if(alP != -1){
    if(alP == 1){
-    EEPROMData.eevar.alrmPin = PIN_WATER_EMPTY;
+    EEPROMData.eevar.alrmPin = 1;
     }else if(alP == 2){
-     EEPROMData.eevar.alrmPin = FLOW1_SENSOR_PIN;
+     EEPROMData.eevar.alrmPin = 2;
     }else if(alP == 3){
-     EEPROMData.eevar.alrmPin = FLOW2_SENSOR_PIN;
+     EEPROMData.eevar.alrmPin = 2;
     }else if(alP == 0){
      EEPROMData.eevar.alrmPin = 0;
     }
