@@ -267,7 +267,6 @@ Timer Watertimer(500, setReadWaterFullFlag);   // This Constantly evalues the wa
 int rawwater;
 int rawwaterEmpty;
 int fcntr=0;
-
 struct runing_t {
       //User prefernces,  Ball Fill, Solenoid Fill, Magic Button, Door Alarm, Empty water Sensor,
       uint16_t fillstatus;
@@ -296,6 +295,7 @@ struct runing_t {
       bool alrmOverRide;
       bool alrmPublish;
       uint16_t alrmstatus;
+      uint16_t alrmstate;
 
       bool alrmdisarm;
       uint16_t Water_Full_Value = 2000; // Less Than 2000 is a full value.
@@ -455,13 +455,13 @@ void FeedComplete(void){
 int sensorOperator(bool logic, int inval, int threshold ){
  // 1 logic    Inval < compare  returns 1  else return 0
  // 0 logic    Inval >= compare  returns 1  else return 0
-  if(logic == 1){
+  if(logic == true){
       if(inval < threshold){
          return 1;
       }else{
          return 0;
       }
-    }else if(logic = 0){
+    }else if(logic == false){
       if(inval >= threshold){
          return 1;
       }else{
@@ -491,7 +491,6 @@ void ReadWaterEmpty(void){
   rawwaterEmpty = analogRead(PIN_WATER_EMPTY);
   run.resempty = sensorOperator(EEPROMData.eevar.sensorwEmptyLogic, rawwaterEmpty, run.Water_Empty_Value);
  }
-
 void pollDHT(){
 
     f = dht.readTemperature(true);
@@ -511,24 +510,29 @@ void pollDHT(){
     Particle.publish("DHT", run.publishString);
 	run.readHumidTemp = 0;
  }
-bool ReadAlrmSensor(int alarmPin, int alarmAction, int alarmLogic, int alarmThreshold, int alarmOverride, int disarm){
-
-  if(disarm == 1)
-     return 0;
-  int alarmraw = analogRead(alarmPin);
-  run.alrmstatus = sensorOperator(alarmLogic, alarmraw, alarmThreshold);
+bool ReadAlrmSensor(int alarmPin, int alarmAction, bool alarmLogic, int alarmThreshold, int alarmOverride, int disarm){
   run.readAlrmFlag = 0;
-  if(alarmOverride == 1){  // ensures the override is stays on, until toggled via web call, or reboot
-     run.alrmstatus = 1;
-   }
-  if(run.alrmstatus != 1 ){
-    AlarmAction(0, alarmAction);
-    return 0;
-   }else if(run.alrmstatus == 1){
-    AlarmAction(1, alarmAction);
-    return 1;
-   }
 
+  if(disarm == 1 || alarmOverride == 1)
+     return 0;
+
+    int alarmraw = analogRead(alarmPin);
+    run.alrmstatus = sensorOperator(alarmLogic, alarmraw, alarmThreshold);
+
+  if( run.alrmstatus != run.alrmstate ){  // looking for a chnage in state...
+
+      run.alrmstate = run.alrmstatus;
+
+    if(run.alrmstatus != 1 ){
+      AlarmAction(0, alarmAction);
+      return 1;
+     }else if(run.alrmstatus == 1){
+      AlarmAction(1, alarmAction);
+      return 1;
+     }
+  }
+
+ return 0;
  }
 int publishAlarm(String args){
    // publish at 5 min internvals while events are set
@@ -643,34 +647,41 @@ void FeedStop(void){
     pinCtrl(PIN_FEED_PUMP, "FeedPump", "off");
     FeedPump.stop();
  }
-bool AlarmAction(bool state, int pinAction){
+bool AlarmAction(int state, int pinAction){
+
   if(pinAction == 0){
     return 0;
-  }else if(pinAction == 1){  // 0 == 0 disabled , A5 == 1 wempty  A4 == 2 Flow1 A3 == 3 Flow2
+  }else if(pinAction == 1){
     // Ball open pin high   A0
-    if(state = 1){
+    if(state == 1){
       pinCtrl(PIN_WATER_FILL_BALL_OPEN, "Alarm relay (Bclose)" ,"on");
+      Particle.publish("Alarm", "On");
       return 1;
     }else if(state == 0){
+      Particle.publish("Alarm", "Off");
       pinCtrl(PIN_WATER_FILL_BALL_OPEN, "Alarm relay (Bclose)" ,"off");
       return 1;
     }
   }else if(pinAction == 2) {
     // Ball Close  A2
-    if(state = 1){
+    if(state == 1){
       pinCtrl(PIN_WATER_FILL_BALL_CLOSE, "Alarm relay (Bopen)" ,"on");
+      Particle.publish("Alarm", "On");
       return 1;
     }else if(state == 0){
       pinCtrl(PIN_WATER_FILL_BALL_CLOSE, "Alarm relay (Bopen)" ,"off");
+      Particle.publish("Alarm", "Off");
       return 1;
     }
   }else if(pinAction == 3){
     // Fill   D6
-    if(state = 1){
+    if(state == 1){
       pinCtrl(PIN_RELAY_FILL, "Alarm relay (Fill)" ,"on");
+      Particle.publish("Alarm", "On");
       return 1;
     }else if(state == 0){
       pinCtrl(PIN_RELAY_FILL, "Alarm relay (Fill)" ,"off");
+      Particle.publish("Alarm", "Off");
       return 1;
     }
   }
@@ -697,12 +708,12 @@ int AlarmOnOff(String a){
 
   if(run.alrmOverRide == 1){
     AlarmAction(1, EEPROMData.eevar.alrmAction);
-    Particle.publish("Alarm", "On");
+    return 1;
   }else if(run.alrmOverRide == 0){
     AlarmAction(0, EEPROMData.eevar.alrmAction);
-    Particle.publish("Alarm", "Off");
+    return 2;
   }
- return 1;
+ return -1;
  }
 int ExreadDHT(String a) {
     run.readHumidTemp = 1;
@@ -746,19 +757,22 @@ int SetVar(String args){
    }
   if(alP != -1){
    if(alP == 1){
-    EEPROMData.eevar.alrmPin = 1;
+    EEPROMData.eevar.alrmPin = PIN_WATER_EMPTY;
     }else if(alP == 2){
-     EEPROMData.eevar.alrmPin = 2;
+     EEPROMData.eevar.alrmPin = FLOW1_SENSOR_PIN;
     }else if(alP == 3){
-     EEPROMData.eevar.alrmPin = 2;
+     EEPROMData.eevar.alrmPin = FLOW2_SENSOR_PIN;
     }else if(alP == 0){
      EEPROMData.eevar.alrmPin = 0;
     }
    }
   if(alC != -1)
     EEPROMData.eevar.alrmComp = alC;
-  if(alL != -1)
-    EEPROMData.eevar.alrmLogic = alL;
+  if(alL == 1){
+    EEPROMData.eevar.alrmLogic = true;
+   }else if(alL == 0){
+    EEPROMData.eevar.alrmLogic = false;
+   }
   if(ft != -1)
      EEPROMData.eevar.feedpumpofftime = ft;
   if(wf != -1)
@@ -867,7 +881,6 @@ int ExStart(String args){
 
  return 1;
  }
-
 /////  Parse and Pin Control    /////
 int pinCtrl(int pin, String name, String status){
   if(status == "on"){
@@ -907,10 +920,9 @@ int readPubEEPROM(String a){
   Particle.publish("EEPROM Read " + a, run.publishString);
  return 1;
  }
-
 int publishRunningVariables(String a){
-  sprintf(run.publishString,"{\"fstat\": %d,\"rful\": %d,\"err\": %d,\"m\": %d,\"g\":%d,\"b\": %d,\"ph\":%d,\"rful\": %d,\"rempt\":%d,\"dostat\": %d,\"bopen\": %d,\"bclose\":%d,\"fcomp\":%d,\"flgwl\": %d,\"lstfed\": %d,\"cmwful\":%d,\"cmwept\":%d,\"D1\": %d,\"D2\": %d,\"D3\": %d,\"D4\": %d,\"FP\": %d,\"Feedcnt\": %d}",
-  run.fillstatus,run.resfull,run.error,run.m,run.g,run.b,run.ph,run.resfull,run.resempty,run.dosedRes,run.ballopened,run.ballclosed,run.feedcompleted,run.readWaterLevelFlag,run.lastfeedcomplete,run.Water_Full_Value,run.Water_Empty_Value,Dose1.isActive(),Dose2.isActive(),Dose3.isActive(),Dose4.isActive(),FeedPump.isActive(), fcntr);
+  sprintf(run.publishString,"{\"fstat\": %d,\"rful\": %d,\"err\": %d,\"m\": %d,\"g\":%d,\"b\": %d,\"ph\":%d,\"rful\": %d,\"rempt\":%d,\"dostat\": %d,\"bclose\":%d,\"fcomp\":%d,\"lstfed\": %d,\"D1\": %d,\"D2\": %d,\"D3\": %d,\"D4\": %d,\"FP\": %d,\"Fdcnt\": %d,\"Aov\": %d,\"Adis\": %d, \"AStatus\": %d, \"AState\": %d }",
+  run.fillstatus,run.resfull,run.error,run.m,run.g,run.b,run.ph,run.resfull,run.resempty,run.dosedRes,run.ballclosed,run.feedcompleted,run.lastfeedcomplete,Dose1.isActive(),Dose2.isActive(),Dose3.isActive(),Dose4.isActive(),FeedPump.isActive(), fcntr, run.alrmOverRide, run.alrmdisarm, run.alrmstatus, run.alrmstate);
   Particle.publish("Run Vars" + a, run.publishString);
  return 1;
  }
@@ -937,7 +949,7 @@ void setup() {
      EEPROMData.eevar.alrmAction = 0;
      EEPROMData.eevar.alrmAction2 = 0;
      EEPROMData.eevar.alrmComp = 2000;
-     EEPROMData.eevar.alrmLogic = 1;
+     EEPROMData.eevar.alrmLogic = true;
 
 
      writeEEPROM();
@@ -967,6 +979,7 @@ void setup() {
    run.readHumidTemp = 0;
    run.readAlrmFlag = 0;
 
+   run.alrmstate = 0;
    run.alrmPublish = 0;
    run.alrmstatus = 0;
    run.alrmdisarm = 0;
