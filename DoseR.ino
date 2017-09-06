@@ -263,10 +263,11 @@ Timer Watertimer(500, setReadWaterFullFlag);   // This Constantly evalues the wa
  Timer Dose4(500, Dose4Stop);
  Timer FeedLoop(5000, Feeder);
  Timer PollSensor(300000, setDHTread);  // Should be every 5 min
-
+int alrmstate = 0;
 int rawwater;
 int rawwaterEmpty;
 int fcntr=0;
+
 struct runing_t {
       //User prefernces,  Ball Fill, Solenoid Fill, Magic Button, Door Alarm, Empty water Sensor,
       uint16_t fillstatus;
@@ -295,7 +296,7 @@ struct runing_t {
       bool alrmOverRide;
       bool alrmPublish;
       uint16_t alrmstatus;
-      uint16_t alrmstate;
+
 
       bool alrmdisarm;
       uint16_t Water_Full_Value = 2000; // Less Than 2000 is a full value.
@@ -519,9 +520,9 @@ bool ReadAlrmSensor(int alarmPin, int alarmAction, bool alarmLogic, int alarmThr
     int alarmraw = analogRead(alarmPin);
     run.alrmstatus = sensorOperator(alarmLogic, alarmraw, alarmThreshold);
 
-  if( run.alrmstatus != run.alrmstate ){  // looking for a chnage in state...
+  if( run.alrmstatus != alrmstate ){  // looking for a chnage in state...
 
-      run.alrmstate = run.alrmstatus;
+      alrmstate = run.alrmstatus;
 
     if(run.alrmstatus != 1 ){
       AlarmAction(0, alarmAction);
@@ -922,7 +923,7 @@ int readPubEEPROM(String a){
  }
 int publishRunningVariables(String a){
   sprintf(run.publishString,"{\"fstat\": %d,\"rful\": %d,\"err\": %d,\"m\": %d,\"g\":%d,\"b\": %d,\"ph\":%d,\"rful\": %d,\"rempt\":%d,\"dostat\": %d,\"bclose\":%d,\"fcomp\":%d,\"lstfed\": %d,\"D1\": %d,\"D2\": %d,\"D3\": %d,\"D4\": %d,\"FP\": %d,\"Fdcnt\": %d,\"Aov\": %d,\"Adis\": %d, \"AStatus\": %d, \"AState\": %d }",
-  run.fillstatus,run.resfull,run.error,run.m,run.g,run.b,run.ph,run.resfull,run.resempty,run.dosedRes,run.ballclosed,run.feedcompleted,run.lastfeedcomplete,Dose1.isActive(),Dose2.isActive(),Dose3.isActive(),Dose4.isActive(),FeedPump.isActive(), fcntr, run.alrmOverRide, run.alrmdisarm, run.alrmstatus, run.alrmstate);
+  run.fillstatus,run.resfull,run.error,run.m,run.g,run.b,run.ph,run.resfull,run.resempty,run.dosedRes,run.ballclosed,run.feedcompleted,run.lastfeedcomplete,Dose1.isActive(),Dose2.isActive(),Dose3.isActive(),Dose4.isActive(),FeedPump.isActive(), fcntr, run.alrmOverRide, run.alrmdisarm, run.alrmstatus, alrmstate);
   Particle.publish("Run Vars" + a, run.publishString);
  return 1;
  }
@@ -979,7 +980,6 @@ void setup() {
    run.readHumidTemp = 0;
    run.readAlrmFlag = 0;
 
-   run.alrmstate = 0;
    run.alrmPublish = 0;
    run.alrmstatus = 0;
    run.alrmdisarm = 0;
@@ -1006,6 +1006,7 @@ void setup() {
 
   Particle.variable("ResFull", rawwater);
   Particle.variable("ResEmpty", rawwaterEmpty);
+  Particle.variable("AlarmState", alrmstate);
 
   pinMode(PIN_WATER_FULL, INPUT);
   pinMode(PIN_FEED_PUMP, OUTPUT);
