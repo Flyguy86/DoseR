@@ -7,39 +7,34 @@ in the folling design you'll see it appiled as a
 
 ## Particle actions
 ### xfeed
-|  action |  command |  description |
-| -------- | :----------: | --------: |
-|      xfeed | xfeed:5,m:15,g:10,b:30,ph:4 | xfeed: number of cycles, m g b ph: seconds for each dose pump | 
+|   command |  description |
+|  :----------: | --------: |
+| xfeed:5,m:15,g:10,b:30,ph:4 | xfeed: number of cycles, m g b ph: seconds for each dose pump | 
 
-### Cycle
-|  action  |  command |  description |
-| -------- | :----------: | --------: |
-|       feed | on    |Fill, Dose, Pump on timer |
-|       drain| on    |pump, drain valve on timer |
-|       fill | on    | fill valve open until full |
-|       flush| on    |drain, fill, drain |
-|       dose | m:15,g:10,b:30,ph:4 | if Full drain, fill, dose |
-|       TooHot| on  | |
-|       TooCold|    | |
-|       lightsOut|  | |
-|       lights|     | |
-|       stop!|      | |
-###    Set variable
+### set times and targets
+| command |  description |
+|:----------: | --------: |
+| m:19,g:32,b:100,ph:3 | sets dose values, seconds for each dose pump |
+|    draintime:800          |  time in seconds to drain resivour | 
+|    feedtime:400           |  time in seconds feed pump stays on |
+|    hottarget:80  |  Target temperature in F |
+|    coldtarget:50  target |  Target temperature in F | 
 
-### Cycle
+### cycle
 |   command |  description |
 | :----------: | --------: |
-|       feed | Fill, Dose, Pump on timer |
-|       drain |pump, drain valve on timer |
-|       fill    | fill valve open until full |
-|       flush  |drain, fill, drain |
-|       dose 1 | dose pump on 5 seconds |
-|       dose 2 | dose pump on 5 seconds |
-|       dose 3 | dose pump on 5 seconds |
-|       dose 4 | dose pump on 5 seconds |
-|       TooHot | Env cooler on until next sensor check|
-|       TooCold | Env heaer on until next sensor check |
-|       lightsOut| RF lights off |
+|       feed  | Fill, dose, Pump on timer |
+|       drain | pump, drain valve on timer |
+|       fill  | fill valve open until full |
+|       flush | drain, fill, drain |
+|       dose1 | dose pump on 10 seconds |
+|       dose2 | dose pump on 10 seconds |
+|       dose3 | dose pump on 10 seconds |
+|       dose4 | dose pump on 10 seconds |
+|       pump  | dose pump on 10 seconds |
+|       toohot | Env cooler on until next sensor check |
+|       toocold | Env heaer on until next sensor check |
+|       lightsout| RF lights off |
 |       lights    | RF lights on |
 
 ### stop!  
@@ -47,26 +42,24 @@ in the folling design you'll see it appiled as a
 * turns off pumps
 * exits all current cycles
 
-
-
-
-
-
-
-###    Set variable
-|        MQTT server
-|        MQTT login
-|        MQTT password
-###    Cycle off timers
-|          drain time
-|          feed time
-|          TooHot PID  target
-|          TooCold PID  target
-###    RF codes:
-|         lights on
-|         lights off
-|         env cool
-|         env heat
+###   MQTT server
+* ipaddress or DNS of MQTT server
+###   MQTT login
+* auth username login
+###   MQTTpassword
+* auth user password
+###   RF lights on
+* RF hex code to turn lights on
+###   RF lights off
+* RF hex code to turn lights on
+###   RF env cool on
+* RF hex code to turn cooler on
+###   RF env cool off
+* RF hex code to turn cooler off
+###   RF env heat on
+* RF hex code to turn heater on
+###   RF env heat off
+* RF hex code to turn heater off
 
 
 ## Beta 5
