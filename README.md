@@ -6,10 +6,14 @@ in the folling design you'll see it appiled as a
 * greenhouse enviornment control
 
 ## Particle actions
+### xfeed
+|  action |  command |  description |
+| -------- | :----------: | --------: |
+|      xfeed | xfeed:5,m:15,g:10,b:30,ph:4 | feed cycle multipiler | 
+
 ###    Call cycles
 |  cycle |  command |  description |
 | -------- | :----------: | --------: |
-|      xfeed | xfeed:5,m:15,g:10,b:30,ph:4 | feed cycle multipiler | 
 |       feed | on    |Fill, Dose, Pump on timer |
 |       drain| on    |pump, drain valve on timer |
 |       fill | on    | fill valve open until full |
@@ -26,6 +30,22 @@ in the folling design you'll see it appiled as a
 
 
 
+
+
+###    Set variable
+|        MQTT server
+|        MQTT login
+|        MQTT password
+###    Cycle off timers
+|          drain time
+|          feed time
+|          TooHot PID  target
+|          TooCold PID  target
+###    RF codes:
+|         lights on
+|         lights off
+|         env cool
+|         env heat
 
 
 ## Beta 5
