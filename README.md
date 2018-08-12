@@ -1,5 +1,8 @@
-#DoseR
-is a Process controller, in the folling design you'll see it appiled to a hydroponic feeding system & greenhouse enviornment control
+# DoseR
+is a Process controller, 
+in the folling design you'll see it appiled as a 
+-hydroponic feeding system 
+-greenhouse enviornment control
 
 ## Particle actions
 ###    Call cycles
