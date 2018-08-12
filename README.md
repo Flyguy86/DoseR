@@ -18,7 +18,7 @@ in the folling design you'll see it appiled as a
 |    draintime:800          |  time in seconds to drain resivour | 
 |    feedtime:400           |  time in seconds feed pump stays on |
 |    hottarget:80  |  Target temperature in F |
-|    coldtarget:50  target |  Target temperature in F | 
+|    coldtarget:50 |  Target temperature in F | 
 
 ### cycle
 |   command |  description |
