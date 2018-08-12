@@ -1,17 +1,21 @@
 # DoseR
 is a Process controller, 
 in the folling design you'll see it appiled as a 
--hydroponic feeding system 
--greenhouse enviornment control
+* hydroponic feeding system 
+* recirculating resivour controler
+* greenhouse enviornment control
 
 ## Particle actions
 ###    Call cycles
 |  cycle |  command |  description |
 | -------- | :----------: | --------: |
-|       feed |      |Fill, Dose, Pump on timer|
-|       drain|      |pump, drain valve on timer|
-|       dose |      |if Full, Drain|
-|       TooHot|     | |
+|      xfeed | xfeed:5,m:15,g:10,b:30,ph:4 | feed cycle multipiler | 
+|       feed | on    |Fill, Dose, Pump on timer |
+|       drain| on    |pump, drain valve on timer |
+|       fill | on    | fill valve open until full |
+|       flush| on    |drain, fill, drain |
+|       dose | m:15,g:10,b:30,ph:4 | if Full drain, fill, dose |
+|       TooHot| on  | |
 |       TooCold|    | |
 |       lightsOut|  | |
 |       lights|     | |
