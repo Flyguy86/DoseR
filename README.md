@@ -9,7 +9,22 @@ in the folling design you'll see it appiled as a
 ### xfeed
 |  action |  command |  description |
 | -------- | :----------: | --------: |
-|      xfeed | xfeed:5,m:15,g:10,b:30,ph:4 | feed cycle multipiler | 
+|      xfeed | xfeed:5,m:15,g:10,b:30,ph:4 | xfeed: number of cycles, m g b ph: seconds for each dose pump | 
+
+### Cycle
+|  action  |  command |  description |
+| -------- | :----------: | --------: |
+|       feed | on    |Fill, Dose, Pump on timer |
+|       drain| on    |pump, drain valve on timer |
+|       fill | on    | fill valve open until full |
+|       flush| on    |drain, fill, drain |
+|       dose | m:15,g:10,b:30,ph:4 | if Full drain, fill, dose |
+|       TooHot| on  | |
+|       TooCold|    | |
+|       lightsOut|  | |
+|       lights|     | |
+|       stop!|      | |
+###    Set variable
 
 ### Cycle
 |   command |  description |
@@ -18,14 +33,19 @@ in the folling design you'll see it appiled as a
 |       drain |pump, drain valve on timer |
 |       fill    | fill valve open until full |
 |       flush  |drain, fill, drain |
-|       dose 1 | if Full drain, fill, dose |
-|       TooHot | |
-|       TooCold | |
-|       lightsOut| |
-|       lights    | |
-|       stop!      | |
+|       dose 1 | dose pump on 5 seconds |
+|       dose 2 | dose pump on 5 seconds |
+|       dose 3 | dose pump on 5 seconds |
+|       dose 4 | dose pump on 5 seconds |
+|       TooHot | Env cooler on until next sensor check|
+|       TooCold | Env heaer on until next sensor check |
+|       lightsOut| RF lights off |
+|       lights    | RF lights on |
 
-###    Set variable
+### stop!  
+* Closes fill vavles
+* turns off pumps
+* exits all current cycles
 
 
 
