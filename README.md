@@ -11,19 +11,20 @@ in the folling design you'll see it appiled as a
 | -------- | :----------: | --------: |
 |      xfeed | xfeed:5,m:15,g:10,b:30,ph:4 | feed cycle multipiler | 
 
-###    Call cycles
-|  cycle |  command |  description |
-| -------- | :----------: | --------: |
-|       feed | on    |Fill, Dose, Pump on timer |
-|       drain| on    |pump, drain valve on timer |
-|       fill | on    | fill valve open until full |
-|       flush| on    |drain, fill, drain |
-|       dose | m:15,g:10,b:30,ph:4 | if Full drain, fill, dose |
-|       TooHot| on  | |
-|       TooCold|    | |
-|       lightsOut|  | |
-|       lights|     | |
-|       stop!|      | |
+### Cycle
+|   command |  description |
+| :----------: | --------: |
+|       feed | Fill, Dose, Pump on timer |
+|       drain |pump, drain valve on timer |
+|       fill    | fill valve open until full |
+|       flush  |drain, fill, drain |
+|       dose 1 | if Full drain, fill, dose |
+|       TooHot | |
+|       TooCold | |
+|       lightsOut| |
+|       lights    | |
+|       stop!      | |
+
 ###    Set variable
 
 
