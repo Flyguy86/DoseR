@@ -1,6 +1,24 @@
-# DoseR
+#DoseR
+is a Process controller, in the folling design you'll see it appiled to a hydroponic feeding system & greenhouse enviornment control
 
-hydro process control sysytem
+## Particle actions
+###    Call cycles
+|  cycle |  command |  description |
+| -------- | :----------: | --------: |
+|       feed |      |Fill, Dose, Pump on timer|
+|       drain|      |pump, drain valve on timer|
+|       dose |      |if Full, Drain|
+|       TooHot|     | |
+|       TooCold|    | |
+|       lightsOut|  | |
+|       lights|     | |
+|       stop!|      | |
+###    Set variable
+
+
+
+
+
 
 
 ## Beta 5
