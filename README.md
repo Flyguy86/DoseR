@@ -11,7 +11,7 @@ in the folling design you'll see it appiled as a
 |  :----------: | --------: |
 | xfeed:5,m:15,g:10,b:30,ph:4 | xfeed: number of cycles, m g b ph: seconds for each dose pump | 
 
-### set times and targets
+### set
 | command |  description |
 |:----------: | --------: |
 | m:19,g:32,b:100,ph:3 | sets dose values, seconds for each dose pump |
