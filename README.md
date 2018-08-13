@@ -43,28 +43,15 @@ in the folling design you'll see it appiled as a
 * exits all current cycles
 
 ###   MQTT server
-|   command |  description |
-|  :----------: | --------: |
-| string | ipaddress or DNS of MQTT server | 
-
-###   MQTT login
-|   command |  description |
-|  :----------: | --------: |
-| string | auth user login |
-###   MQTTpassword
-|   command |  description |
-|  :----------: | --------: |
-| string | auth user password |
-###   RF lights on
-* RF hex code to turn lights on
-###   RF lights off
-* RF hex code to turn lights on
-###   RF env cool on
-* RF hex code to turn cooler on
-###   RF env cool off
-* RF hex code to turn cooler off
-###   RF env heat on
-* RF hex code to turn heater on
-###   RF env heat off
-* RF hex code to turn heater off
+| action |   command |  description |
+| :------ | :----------: | --------: |
+| MQTT server| 192.168.1.1 | ipaddress or DNS of MQTT server | 
+| MQTT user name| bob | auth user login | 
+| MQTT password | ross | auth user password | 
+| RF lights on | 3eff4453E2ead | RF hex code to turn lights on
+| RF lights off | 3eff4453E2ead | RF hex code to turn lights off
+| RF cooler on | 3eff4453E2ead | RF hex code to turn cooler on
+| RF cooler off | 3eff4453E2ead | RF hex code to turn cooler off
+| RF heater on | 3eff4453E2ead | RF hex code to turn heater on
+| RF heater off | 3eff4453E2ead | RF hex code to turn heater off
 
